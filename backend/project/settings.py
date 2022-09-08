@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'corsheaders',
     'celery',
-    'django_celery_beat',
 
     'orders',
 ]
@@ -61,7 +60,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -106,12 +105,16 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+SPECTACULAR_SETTINGS = {
+    'COMPONENT_SPLIT_REQUEST': True
+}
 
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_RESULT_URL', 'redis://redis:6379/1')
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_IGNORE_RESULT = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

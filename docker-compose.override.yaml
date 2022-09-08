@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  django:
+    ports:
+      - "8000:8000"
+
+  celery:
+    command: celery -A project worker -l debug -E

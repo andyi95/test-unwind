@@ -1,0 +1,45 @@
+version: '3.4'
+
+services:
+  django:
+    build: backend
+    entrypoint: ./entrypoint.sh
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app:cached
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.spectr.rule=Host(`unwind.stage.andyi95.com`)"
+      - "traefik.http.services.spectr.loadbalancer.server.port=8000"
+
+  db:
+    image: postgres:14
+    restart: unless-stopped
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_DB=${DB_NAME}"
+      - "POSTGRES_USER=${DB_USER}"
+      - "POSTGRES_PASSWORD=${DB_PASSWORD}"
+
+  redis:
+    image: "redis:latest"
+    restart: unless-stopped
+    volumes:
+      - ./redis-data:/data
+
+  celery:
+    build: backend
+    restart: unless-stopped
+    command: celery -A project worker
+    volumes:
+      - ./backend:/app:cached
+    env_file:
+      - .env
+    depends_on:
+      - redis
