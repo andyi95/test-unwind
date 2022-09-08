@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import Coalesce
@@ -30,12 +31,12 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         """Получение общей статистики по отгрузкам."""
         overdue_f = Q(delivery_term__lt=date.today())
         qs = Order.objects.aggregate(
-            sum_rub=Coalesce(Sum('price_rub'), 0.0),
-            sum_usd=Coalesce(Sum('price_usd'), 0.0),
+            sum_rub=Coalesce(Sum('price_rub'), Decimal(0.0)),
+            sum_usd=Coalesce(Sum('price_usd'), Decimal(0.0)),
             overall_amt=Coalesce(Count('id'), 0),
             overdue_amt=Coalesce(Count('id', filter=overdue_f), 0),
-            overdue_sum_usd=Coalesce(Sum('price_usd', filter=overdue_f), 0.0),
-            overdue_sum_rub=Coalesce(Sum('price_rub', filter=overdue_f), 0.0)
+            overdue_sum_usd=Coalesce(Sum('price_usd', filter=overdue_f), Decimal(0.0)),
+            overdue_sum_rub=Coalesce(Sum('price_rub', filter=overdue_f), Decimal(0.0))
         )
         serializer = StatsSerializer(qs, many=False, read_only=True)
         return Response(serializer.data)
