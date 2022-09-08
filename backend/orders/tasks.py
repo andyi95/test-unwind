@@ -1,10 +1,12 @@
 import decimal
+from datetime import datetime
+
+from django.db.models import Q
 
 from celery import shared_task
-from .services import CommonOrderService
+
 from .models import Order
-from datetime import datetime
-from django.db.models import Q
+from .services import CommonOrderService
 
 
 @shared_task
